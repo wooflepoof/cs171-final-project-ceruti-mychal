@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+	<script src="../libs/underscore-min.js"></script>
+</head>
+<body>
+
+<script>
+
+
+var dataset = [],
+	dataset2 = [];
+	
+var api = "http://api.themoviedb.org/3/",
+	apiQuery = "&query=",
+	apiKey = "?api_key=44aff3cbdf6ac5bf7e67ffa2c67e1838",
+	apiYear = "&year=";
+	
+function getCast(data){
+	apiMode  = "movie/"
+	movieID = data.id;
+	abrCast = [];
+	
+	$.ajax({ 
+        type: 'GET',
+        contentType: 'application/json',
+        dataType: 'jsonp',
+        url: api + apiMode + movieID + "/credits" + apiKey,
+        success: function(data){
+           _.each(data.cast, function(d){
+				if (d.order < 10){
+					abrCast.push(d.name);
+				}
+			})
+			dataset2.push({"id":data.id, "cast":abrCast});
+        },
+		async:false
+	});
+	console.log(3)
+}
+
+function assembleDataSet(data){
+	apiMode  = "movie/"
+	movieID = data;
+	
+	$.ajax({ 
+        type: 'GET',
+        contentType: 'application/json',
+        dataType: 'jsonp',
+        url: api + apiMode + movieID + apiKey,
+        success: function(d){
+			getCast(d)
+			dataset.push({"title": d.title,"revenue": d.revenue,"release date": d.release_date,"poster": d.poster_path,"id":d.id});
+		   		   
+        },
+		async:false
+	});
+	console.log(2)
+}
+
+//This script grabs the IMDB data for each movie in movieBudgetGrossData.csv
+
+//gets the Movie data from each movie using TMDBAPI
+function getMovieData(title, year){// inspired by: http://stackoverflow.com/questions/19699877/get-poster-variable-from-omdbapi-using-ajax-call
+	var mTitle = title.split(' ').join('+'), //reformat the strings with spaces
+		mYear = year,
+		apiMode = "search/movie";
+
+	$.ajax({ 
+        type: 'GET',
+        contentType: 'application/json',
+//		jsonpCallback: 'testing',
+        dataType: 'jsonp',
+        url: api + apiMode + apiKey + apiQuery + mTitle + apiYear + mYear,
+        success: function(data){
+           assembleDataSet(data.results[0].id); 
+        },
+		async:false
+	});
+	console.log(1)
+}
+
+//Load the csv and call the get data function
+function loadMovies(){
+	d3.csv("movieBudgetGrossData1993_2013reduced.csv",function(error,data){
+	
+	completeDataSet = data
+	
+	_.each(data, function(d){
+		getMovieData(d['title'], +d['year']);
+		});
+	
+	});
+
+};
+	
+loadMovies()
+
+
+
+
+//Modify saveToFile code from previous assignment
+/*
+
+    var saveToFile = function(arrayOfLines, fileName) {
+
+       var blob, blobText;
+       blobText = arrayOfLines.map(function(d) {
+         if (d.endsWith("\n")) {
+           return d;
+         } else {
+           return d + "\n";
+         }
+       });
+       blob = new Blob(blobText, {
+         type: "text/plain;charset=utf-8"
+       });
+       return saveAs(blob, fileName);
+     };
+
+     String.prototype.endsWith = function(suffix) {
+       return this.indexOf(suffix, this.length - suffix.length) !== -1;
+     };
+	 
+*/
+
+</script>
+
+</body>
+</html>

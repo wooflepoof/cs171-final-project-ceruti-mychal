@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+	<script src="../libs/underscore-min.js"></script>
+</head>
+<body>
+
+<script>
+
+
+var dataset = [];
+
+// inspired by: http://stackoverflow.com/questions/19699877/get-poster-variable-from-omdbapi-using-ajax-call
+
+/*_.each(data, function(d){
+		getMovieData(d['title'], +d['year']);
+		});*/
+
+function getMovieData(title, year){
+	var mTitle = title.split(' ').join('+') 
+	var mYear = year
+	console.log(mTitle)
+	$.ajax({ 
+        type: "GET",
+        dataType: "json",
+        url: "http://www.omdbapi.com/?t=" + mTitle + "&y=" + mYear,
+        success: function(data){
+            console.log(data) 
+        },
+		async:false
+	});
+//stuff goes here
+}
+
+
+//UNUSABLE due to imdb not allowing screen scraping
+/*
+function getSalaryData(actor, movie){
+
+	function getActorID(actor){
+	
+		fActor = actor.split(' ').join('+');
+		$.ajax({ 
+			type: "GET",
+			dataType: "json",
+			url: "http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=" + fActor,
+			success: function(data){
+				console.log(data); 
+			},
+			async:false
+		});
+	}
+
+
+	$.ajax({
+		url: "http://www.imdb.com/name/"+ getActorID(actor) + "/bio",
+        type: 'GET',
+        cache: false,
+        success: function(data) {
+		
+            var root,allData, body, table;
+            root = $("<div></div>")
+            root.html(data.responseText)
+		
+			//find the table (NOTE_TO_SELF: have the program search for the proper table by id or something in future)	
+			var getTable = root.find("table#salariesTable.dataTable.labelValueTable");
+
+				
+			};
+
+	});
+
+}*/ 
+
+function loadMovies(){
+	d3.csv("../finalProject/data/movieBudgetGrossData1993_2013r.csv",function(error,data){
+	
+	completeDataSet = data
+	
+	_.each(data, function(d){
+		getMovieData(d['title'], +d['year']);
+		});
+	
+	});
+};
+
+loadMovies()
+
+function createVis(){
+
+};
+
+</script>
+
+</body>
+</html>

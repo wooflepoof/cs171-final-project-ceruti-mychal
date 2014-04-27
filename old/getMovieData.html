@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+	<script src="../libs/underscore-min.js"></script>
+</head>
+<body>
+
+<script>
+
+
+var dataset = [];
+
+//This script grabs the IMDB data for each movie in movieBudgetGrossData.csv
+//gets the IMDB data from each movie using OMDBAPI
+function getMovieData(title, year){// inspired by: http://stackoverflow.com/questions/19699877/get-poster-variable-from-omdbapi-using-ajax-call
+	var mTitle = title.split(' ').join('+') //reformat the strings with spaces
+	var mYear = year
+	var apiKey = "?api_key=44aff3cbdf6ac5bf7e67ffa2c67e1838"
+	var movieByID = "http://themoviedb.apiary-proxy.com/3/movie/"
+	console.log(mTitle)
+	$.ajax({ 
+        type: 'GET',
+        contentType: 'application/json',
+        dataType: 'jsonp',
+        url: "http://themoviedb.apiary-proxy.com/3/search/movie" ,
+        success: function(data){
+            console.log(data) 
+        },
+		async:false
+	});
+//stuff goes here
+}
+
+
+//UNUSABLE code due to imdb disallowing screen scraping
+/*
+function getSalaryData(actor, movie){
+
+	function getActorID(actor){
+	
+		fActor = actor.split(' ').join('+');
+		$.ajax({ 
+			type: "GET",
+			dataType: "json",
+			url: "http://www.imdb.com/xml/find?json=1&nr=1&nm=on&q=" + fActor,
+			success: function(data){
+				console.log(data); 
+			},
+			async:false
+		});
+	}
+
+
+	$.ajax({
+		url: "http://www.imdb.com/name/"+ getActorID(actor) + "/bio",
+        type: 'GET',
+        cache: false,
+        success: function(data) {
+		
+            var root,allData, body, table;
+            root = $("<div></div>")
+            root.html(data.responseText)
+		
+			//find the table (NOTE_TO_SELF: have the program search for the proper table by id or something in future)	
+			var getTable = root.find("table#salariesTable.dataTable.labelValueTable");
+
+				
+			};
+
+	});
+
+}*/ 
+
+//Load the csv and call the get data function
+function loadMovies(){
+	d3.csv("../finalProject/data/movieBudgetGrossData1993_2013r.csv",function(error,data){
+	
+	completeDataSet = data
+	
+	_.each(data, function(d){
+		getMovieData(d['title'], +d['year']);
+		});
+	
+	});
+};
+
+loadMovies()
+//Modify saveToFile code from previous assignment
+/*
+
+    var saveToFile = function(arrayOfLines, fileName) {
+
+       var blob, blobText;
+       blobText = arrayOfLines.map(function(d) {
+         if (d.endsWith("\n")) {
+           return d;
+         } else {
+           return d + "\n";
+         }
+       });
+       blob = new Blob(blobText, {
+         type: "text/plain;charset=utf-8"
+       });
+       return saveAs(blob, fileName);
+     };
+
+     String.prototype.endsWith = function(suffix) {
+       return this.indexOf(suffix, this.length - suffix.length) !== -1;
+     };
+	 
+*/
+
+</script>
+
+</body>
+</html>

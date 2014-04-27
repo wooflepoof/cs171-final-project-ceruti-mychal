@@ -46,7 +46,11 @@ function getCast(mData){
 			dataset2.push({"title": mData.title,"revenue": mData.revenue,"release date": mData.release_date,"poster": mData.poster_path,"id":mData.id, "cast":abrCast})
 			counter ++
 			if (counter == totalCount){
-				console.log(dataset2)
+				var nestedData = d3.nest()
+				.key(function(d) {return d.title; })
+				.entries(dataset2);
+				
+				console.log(nestedData)
 			}
         },
 		

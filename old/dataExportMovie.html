@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+</head>
+<body>
+
+<script>
+    var convertToInt;
+	var apiKey = 44aff3cbdf6ac5bf7e67ffa2c67e1838
+	var movieName;
+	var actorName;
+
+	$.ajax({
+		url: "http://en.wikipedia.org/wiki/World_population_estimates",
+        type: 'GET',
+        cache: false,
+        success: function(data) {
+		
+			wordsArray = new Array();
+			wordsArray[0] = "year,USCensus,PopulationBureau,UN,HYDE,Maddison"; //Thanks Mimi!(@488);
+		
+            var root,allData, body, table;
+            root = $("<div></div>")
+            root.html(data.responseText)
+		
+			//find the table (NOTE_TO_SELF: have the program search for the proper table by id or something in future)	
+			var getTable = root.find("table.wikitable");
+
+			/* Select the table rows and for each row(start with 0)...*/
+			var getRows = getTable.find("tr:gt(9)").each(function(index, value){
+					var lineArray = [];
+					/* Select the first 6 td" elements columns and iterate over them*/	
+					$(this).find('td:lt(6)')
+					.each(function(index, value){
+						if ($(value).text().length > 0){
+							return lineArray.push(convertToInt(($(value).text())));
+						}
+						/*Push empty cells to the array*/
+						else{
+							return lineArray.push('');
+						}
+					});
+			
+				/* ignore the empty rows...(I know it's a little hack-ey, but time is running short :-/ */
+				var counter = 0
+				
+				for (var i = 1; i < lineArray.length; i++){
+					if ((lineArray[i].toString().length) != 0){
+						counter = counter += 1 ;
+					}
+				};
+
+				if (counter != 0){
+						wordsArray.push(lineArray.toString());
+						counter = 0
+				};
+			});
+			
+		/*Save the file*/
+		saveToFile(wordsArray, "popData.csv")
+        },
+        error: function() {
+            return console.log("error");
+        }
+    });
+
+
+    convertToInt = function(s) {
+        return parseInt(s.replace(/,/g, ""), 10);
+    };
+	
+    /* takes an array of strings
+       and writes them line by line into a file given by filename
+     */
+    var saveToFile = function(arrayOfLines, fileName) {
+       /* adds linebreaks at the end*/
+       var blob, blobText;
+       blobText = arrayOfLines.map(function(d) {
+         if (d.endsWith("\n")) {
+           return d;
+         } else {
+           return d + "\n";
+         }
+       });
+       blob = new Blob(blobText, {
+         type: "text/plain;charset=utf-8"
+       });
+       return saveAs(blob, fileName);
+     };
+
+     String.prototype.endsWith = function(suffix) {
+       return this.indexOf(suffix, this.length - suffix.length) !== -1;
+     };
+	
+
+
+
+</script>
+
+
+</body>
+</html>
