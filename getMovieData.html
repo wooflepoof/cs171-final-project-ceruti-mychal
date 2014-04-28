@@ -15,7 +15,8 @@
 
 
 var dataset = [],
-	dataset2 = [];
+	dataset2 = [],
+	outputData = {};
 	
 var api = "http://api.themoviedb.org/3/",
 	apiQuery = "&query=",
@@ -24,7 +25,7 @@ var api = "http://api.themoviedb.org/3/",
 	
 var counter = 0,
 	totalCount
-
+	
 function getCast(mData){
 	apiMode  = "movie/"
 	movieID = mData.id;
@@ -43,10 +44,21 @@ function getCast(mData){
 					abrCast.push(d.name);
 				}
 			})
-			dataset2.push({"title": mData.title,"revenue": mData.revenue,"release date": mData.release_date,"poster": mData.poster_path,"id":mData.id, "cast":abrCast})
+			var mCast = abrCast;
+			if (mData.revenue === 0){
+				dataset2.push({"title": mData.title,"revenue": mData.revenue,"release_date": mData.release_date,"poster": mData.poster_path,"id":mData.id, "imdb":mData.imdb_id, "cast":mCast})
+			}
+			else{
+				dataset.push({"title": mData.title,"revenue": mData.revenue,"release_date": mData.release_date,"poster": mData.poster_path,"id":mData.id, "imdb":mData.imdb_id, "cast":mCast})
+			};
+			
 			counter ++
+
 			if (counter == totalCount){
-				console.log(dataset2)
+//			console.log(dataset)
+//			console.log(dataset2)
+				saveToFile(dataset, "movieData.json")
+				saveToFile(dataset2, "moviedata_noRevenue.json");
 			}
         },
 		
@@ -66,7 +78,6 @@ function assembleDataSet(data){
 			url: api + apiMode + movieID + apiKey,
 			success: function(d){
 				getCast(d);
-//				dataset.push({"title": d.title,"revenue": d.revenue,"release date": d.release_date,"poster": d.poster_path,"id":d.id});
 			}
 		});
 }
@@ -87,7 +98,13 @@ function getMovieData(data){  // inspired by: http://stackoverflow.com/questions
 			dataType: 'jsonp',
 			url: api + apiMode + apiKey + apiQuery + mTitle + apiYear + mYear,
 			success: function(data){
-			assembleDataSet(data.results[0].id); 
+				try{
+					assembleDataSet(data.results[0].id);
+				}
+				catch(e){
+					console.log(mTitle);
+					console.log(e);
+				}
 			},
 			
 		});
@@ -97,7 +114,7 @@ function getMovieData(data){  // inspired by: http://stackoverflow.com/questions
 
 //Load the csv and call the get data function
 function loadMovies(){
-	d3.csv("movieBudgetGrossData1993_2013reduced.csv",function(error,data){
+	d3.csv("movieBudgetGrossData1993_2013v2.csv",function(error,data){
 	
 	completeDataSet = data
 	totalCount = completeDataSet.length
@@ -114,14 +131,30 @@ loadMovies()
 //Modify saveToFile code from previous assignment
 
 
-    var saveToFile = function(object, filename){
+    var saveToFile = function(objArray, filename){
+        var output_data = {},
+			input_data = objArray
+			
+		for (var i = 0; i < input_data.length; i++){
+			var title = input_data[i].title;
+			output_data[title] = {
+				"revenue": input_data[i].revenue,
+				"release date": input_data[i].release_date,
+				"poster": input_data[i].poster,
+				"id":input_data[i].id,
+				"imdb":input_data[i].imdb,
+				"cast":input_data[i].cast
+			};
+		}
+		
         var blob, blobText;
-        blobText = [JSON.stringify(object)];
+        blobText = [JSON.stringify(output_data)];
         blob = new Blob(blobText, {
             type: "text/plain;charset=utf-8"
         });
         saveAs(blob, filename);
     }
+
 
 
 </script>
