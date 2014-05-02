@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+	<script src="../libs/underscore-min.js"></script>
+</head>
+<body>
+
+<script>
+
+getActorData = function(data) {
+
+	var movies = data;
+	
+	var actors = []
+	
+	var minGross = 2000000000
+	
+	getActors = function(){
+		actorlist = [];
+		_.each(movies, function(d){
+			_.each(d.cast, function(e){
+				actorlist.push(e)			
+			})
+		})
+		actorList = _.uniq(actorlist)
+		_.each(actorList, function(d){
+			gross = 0
+			_.each(movies, function(e){
+				if(_.contains(e.cast, d)){
+					gross += e.revenue
+				}
+			})
+			if( gross >= minGross){ 
+				actors.push({"actor": d, "sum": gross});
+			}
+		})
+	};
+	
+	getActors();
+	
+	console.log(actors);
+	
+	
+
+};
+
+function loadMovieData() {
+
+    d3.json("../finalProject/data/movieData.json", function(error,data){
+	
+			dataSetM = data
+
+		
+		getActorData(dataSetM);
+		
+    })
+
+};		
+
+loadMovieData();
+
+</script>
+
+</body>
+</html>

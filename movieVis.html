@@ -1,38 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>CS171 - Final Project</title>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <style>
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: lightgrey; }
-
-        .dataArea {
-            stroke: 1px steelblue;
-            fill:steelblue;
-            fill-opacity:0.5;
-            clip-path: url(#clip);
-			
-        }
-		h1
-		{
-		text-align:center;
-			font-family:sans-serif;
-			font-weight:bold;
-			font-size:18px;
-		}
-
-
-    </style>
-
+	<head>
+		<title>CS171 - Final Project</title>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="../libs/underscore-min.js"></script>
+		<link rel="stylesheet" type="text/css" href="movieVis.css">
 </head>
+
 <body>
-    <div id="vis"></div>
+	<div id="header" align="center">
+		<h1>Top Hollywood Artists' Performance Over Time: 1993-2013 </h1></div>
+	<div id="mainVis"></div>
+	<div id="timeVis"></div>
+	<div id="detailVis"></div>
 
-
-	<script src = "movieVis.js"></script>
+	<script src="movieVis.js"></script>
 
 
 </body>

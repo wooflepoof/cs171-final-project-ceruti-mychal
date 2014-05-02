@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <script src="../libs/jquery-1.10.1.js"></script>
+    <script src="../libs/jquery.xdomainajax.js"></script>
+    <script src="../libs/d3.v3.min.js"></script>
+    <script src="../libs/FileSaver.js"></script>
+	<script src="../libs/underscore-min.js"></script>
+</head>
+<body>
+
+<script>
+
+
+var dataset = [],
+	counter = 0,
+	totalCount;
+
+/*
+This script grabs and then appends the metacritic score to the movieData file. 
+Added on the fly in order to quickly implement some optional features.
+Utilizes the OMDB API http://www.omdbapi.com/
+*/
+
+function getMovieData(title, data){// inspired by: http://stackoverflow.com/questions/19699877/get-poster-variable-from-omdbapi-using-ajax-call
+	var mData = data
+	var mTitle = title
+	var id = mData.imdb//imdbID
+	$.ajax({ 
+        type: 'GET',
+        dataType: 'json',
+        url: "http://www.omdbapi.com/?i=" + id,
+        success: function(data){
+			var metaScore = {"title": title, "metascore": +data.Metascore};
+            extendedData = _.extend(mData, metaScore);
+			dataset.push(extendedData);
+			counter ++;
+			if (counter == totalCount){
+				saveToFile(dataset, "movieData.json");
+			} 
+        },
+		async:false
+	});
+//stuff goes here
+}
+
+function loadMovies(){
+	d3.json("movieDataTest.json",function(error,data){
+		
+	completeDataSet = data
+	
+	totalCount = Object.keys(completeDataSet).length;
+	_.each(completeDataSet, function(d, i){
+		getMovieData(i, d);
+		});
+	
+	});
+};
+
+loadMovies()
+	var parseDate = d3.time.format("%Y-%m-%d").parse;
+	
+   var saveToFile = function(objArray, filename){
+        var output_data = {},
+			input_data = objArray
+			
+		for (var i = 0; i < input_data.length; i++){
+			var title = input_data[i].title;
+			output_data[title] = {
+				"revenue": input_data[i].revenue,
+				"release_date":input_data[i]["release date"],
+				"poster": input_data[i].poster,
+				"id":input_data[i].id,
+				"imdb":input_data[i].imdb,
+				"cast":input_data[i].cast,
+				"metascore":input_data[i].metascore
+			};
+		}
+        var blob, blobText;
+        blobText = [JSON.stringify(output_data)];
+        blob = new Blob(blobText, {
+            type: "text/plain;charset=utf-8"
+        });
+        saveAs(blob, filename);
+    }
+
+
+</script>
+
+</body>
+</html>

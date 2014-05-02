@@ -1,0 +1,54 @@
+body
+{
+}
+h1
+{
+	text-align:center;
+	font-family:georgia, "times new roman", times, serif;
+	font-size:20px;
+}
+
+.name {
+	pointer-events: none;
+	font-family:georgia, "times new roman", times, serif;
+	font-size:12px;
+	font-weight:normal;
+}
+
+name.select {
+	pointer-events: none;
+	font-family:georgia, "times new roman", times, serif;
+	font-size:16px;
+	font-weight:bold;
+}
+
+.actors.highlighted{
+	fill: orange;
+	fill-opacity: 1;
+}
+.brush .extent{
+    fill:gray;
+    opacity: .3;
+
+}
+
+.point {
+  fill-opacity: 1;
+}
+.point.scanned {
+  fill-opacity: 1;
+
+}
+
+.point.selected {
+  fill-opacity: 1;
+}
+.point.highlighted {
+  fill: orange;
+  fill-opacity: 1;
+}
+.node {
+  fill: none;
+  stroke: none;
+  shape-rendering: crispEdges;
+}
